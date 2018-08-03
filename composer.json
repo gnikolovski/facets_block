@@ -1,0 +1,23 @@
+{
+  "name": "drupal/facets_block",
+  "description": "Render Facets in a single block.",
+  "type": "drupal-module",
+  "homepage": "https://www.drupal.org/project/facets_block",
+  "authors": [
+    {
+      "name": "Goran Nikolovski",
+      "email": "nikolovski84@gmail.com",
+      "homepage": "http://gorannikolovski.com",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/facets_block",
+    "email": "nikolovski84@gmail.com"
+  },
+  "license": "GPL-2.0+",
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/facets": "^1.0"
+  }
+}
