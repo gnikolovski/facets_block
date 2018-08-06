@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Facets Block module.
+ * This is the primary module file.
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
