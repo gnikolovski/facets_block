@@ -159,7 +159,7 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * @return int
    *   Sort value.
    */
-  protected function sortFacetsByWeight($a, $b) {
+  protected function sortFacetsByWeight(\Drupal\facets\FacetInterface $a, \Drupal\facets\FacetInterface $b) {
     $a_weight = $a->getWeight();
     $b_weight = $b->getWeight();
 
