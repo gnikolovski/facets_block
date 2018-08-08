@@ -128,6 +128,7 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * Returns a list of available facets.
    *
    * @return array
+   *   An array of enabled facets.
    */
   protected function getAvailableFacets() {
     $enabled_facets = $this->facetsManager->getEnabledFacets();
@@ -150,10 +151,13 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
   /**
    * Sorts array of objects by object weight property.
    *
-   * @param $a
-   * @param $b
+   * @param \Drupal\facets\FacetInterface $a
+   *   A facet.
+   * @param \Drupal\facets\FacetInterface $b
+   *   A facet.
    *
    * @return int
+   *   Sort value.
    */
   protected function sortFacetsByWeight($a, $b) {
     $a_weight = $a->getWeight();
@@ -179,8 +183,10 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * Builds facets.
    *
    * @param array $facets_to_include
+   *   A list of facets to display.
    *
    * @return array
+   *   An array of facets.
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
@@ -218,7 +224,7 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
           $facets[] = [
             'title' => $facet_title,
-            'content' => $block_plugin->build(),
+            'content' => $build,
           ];
         }
       }
