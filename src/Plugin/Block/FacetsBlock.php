@@ -7,10 +7,11 @@ use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Cache\UncacheableDependencyTrait;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\facets\FacetInterface;
 use Drupal\facets\FacetManager\DefaultFacetManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 
 /**
  * Provides a 'Facets Block' block.
@@ -159,7 +160,7 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * @return int
    *   Sort value.
    */
-  protected function sortFacetsByWeight(\Drupal\facets\FacetInterface $a, \Drupal\facets\FacetInterface $b) {
+  protected function sortFacetsByWeight(FacetInterface $a, FacetInterface $b) {
     $a_weight = $a->getWeight();
     $b_weight = $b->getWeight();
 
