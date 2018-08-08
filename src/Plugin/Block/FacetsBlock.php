@@ -3,8 +3,14 @@
 namespace Drupal\facets_block\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Cache\UncacheableDependencyTrait;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\facets\FacetManager\DefaultFacetManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 
 /**
  * Provides a 'Facets Block' block.
@@ -14,9 +20,71 @@ use Drupal\Core\Form\FormStateInterface;
  *  admin_label = @Translation("Facets Block"),
  * )
  */
-class FacetsBlock extends BlockBase {
+class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   use UncacheableDependencyTrait;
+
+  /**
+   * The Default Facet Manager.
+   *
+   * @var \Drupal\facets\FacetManager\DefaultFacetManager
+   */
+  protected $facetsManager;
+
+  /**
+   * The Module Handler Interface.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
+   * The Block Manager Interface.
+   *
+   * @var \Drupal\Core\Block\BlockManagerInterface
+   */
+  protected $pluginManagerBlock;
+
+  /**
+   * The Account Proxy Interface.
+   *
+   * @var \Drupal\Core\Session\AccountProxyInterface
+   */
+  protected $currentUser;
+
+  /**
+   * FacetsBlock constructor.
+   *
+   * @param array $configuration
+   * @param $plugin_id
+   * @param $plugin_definition
+   * @param \Drupal\facets\FacetManager\DefaultFacetManager $facets_manager
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Block\BlockManagerInterface $plugin_manager_block
+   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, DefaultFacetManager $facets_manager, ModuleHandlerInterface $module_handler, BlockManagerInterface $plugin_manager_block, AccountProxyInterface $current_user) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->facetsManager = $facets_manager;
+    $this->moduleHandler = $module_handler;
+    $this->pluginManagerBlock = $plugin_manager_block;
+    $this->currentUser = $current_user;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('facets.manager'),
+      $container->get('module_handler'),
+      $container->get('plugin.manager.block'),
+      $container->get('current_user')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -55,16 +123,12 @@ class FacetsBlock extends BlockBase {
    * @return array
    */
   protected function getAvailableFacets() {
-    /** @var \Drupal\facets\FacetManager\DefaultFacetManager $facets_manager */
-    $facets_manager = \Drupal::service('facets.manager');
-    $enabled_facets = $facets_manager->getEnabledFacets();
+    $enabled_facets = $this->facetsManager->getEnabledFacets();
     uasort($enabled_facets, [$this, 'sortFacetsByWeight']);
 
     $available_facets = [];
 
-    /** @var \Drupal\Core\Extension\ModuleHandler $module_handler */
-    $module_handler = \Drupal::service('module_handler');
-    if ($module_handler->moduleExists('facets_summary')){
+    if ($this->moduleHandler->moduleExists('facets_summary')) {
       $available_facets['facets_summary_block:summary'] = t('Summary');
     }
 
@@ -119,12 +183,9 @@ class FacetsBlock extends BlockBase {
 
     foreach ($available_facets as $plugin_id => $facet_title) {
       if (isset($facets_to_include[$plugin_id]) && $facets_to_include[$plugin_id] === $plugin_id) {
-        /** @var \Drupal\Core\Block\BlockManager $block_manager */
-        $block_manager = \Drupal::service('plugin.manager.block');
-        /** @var \Drupal\Core\Block\BlockPluginInterface $block_plugin */
-        $block_plugin = $block_manager->createInstance($plugin_id, []);
+        $block_plugin = $this->pluginManagerBlock->createInstance($plugin_id, []);
 
-        if ($block_plugin && $block_plugin->access(\Drupal::currentUser())) {
+        if ($block_plugin && $block_plugin->access($this->currentUser)) {
           $build = $block_plugin->build();
 
           $exclude_empty_facets = !isset($this->configuration['exclude_empty_facets']) ? TRUE : $this->configuration['exclude_empty_facets'];
@@ -135,7 +196,7 @@ class FacetsBlock extends BlockBase {
           if (!$build) {
             $is_empty = TRUE;
           }
-          elseif (isset($build[0]['#attributes']['class']) && $build[0]['#attributes']['class'] === 'facet-empty') {
+          elseif (isset($build[0]['#attributes']['class']) && in_array('facet-empty', $build[0]['#attributes']['class'])) {
             $is_empty = TRUE;
           }
           // Check if Summary Facet is empty.
