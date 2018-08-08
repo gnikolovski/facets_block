@@ -56,12 +56,19 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * FacetsBlock constructor.
    *
    * @param array $configuration
-   * @param $plugin_id
-   * @param $plugin_definition
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
    * @param \Drupal\facets\FacetManager\DefaultFacetManager $facets_manager
+   *   The Facets manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
    * @param \Drupal\Core\Block\BlockManagerInterface $plugin_manager_block
+   *   The Plugin manager block.
    * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   *   Current user.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, DefaultFacetManager $facets_manager, ModuleHandlerInterface $module_handler, BlockManagerInterface $plugin_manager_block, AccountProxyInterface $current_user) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -129,7 +136,7 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $available_facets = [];
 
     if ($this->moduleHandler->moduleExists('facets_summary')) {
-      $available_facets['facets_summary_block:summary'] = t('Summary');
+      $available_facets['facets_summary_block:summary'] = $this->t('Summary');
     }
 
     foreach ($enabled_facets as $facet) {
@@ -174,6 +181,7 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * @param array $facets_to_include
    *
    * @return array
+   *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   protected function buildFacets(array $facets_to_include) {
