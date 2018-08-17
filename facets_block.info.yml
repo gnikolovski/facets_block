@@ -4,4 +4,4 @@ package: 'Other'
 type: module
 core: 8.x
 dependencies:
-  - drupal:facets
+  - facets:facets
