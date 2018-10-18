@@ -1,0 +1,15 @@
+block.settings.facets_block:
+  type: block_settings
+  label: 'Facets Block settings'
+  mapping:
+    show_title:
+      type: boolean
+      label: 'Show Facet titles'
+    exclude_empty_facets:
+      type: boolean
+      label: 'Exclude empty facets'
+    facets_to_include:
+      type: sequence
+      label: 'Facets to include'
+      sequence:
+        type: string
