@@ -5,6 +5,8 @@
  * This is the primary module file.
  */
 
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
@@ -32,4 +34,30 @@ function facets_block_theme($existing, $type, $theme, $path) {
       ],
     ],
   ];
+}
+
+/**
+ * Implements hook_block_view_BASE_BLOCK_ID_alter().
+ */
+function facets_block_block_view_facets_block_alter(array &$build, BlockPluginInterface $block) {
+  $build['#pre_render'][] = '_add_js_classes_to_facets_block';
+}
+
+/**
+ * Helper pre_render function to add js classes to the facets_block block.
+ *
+ * @param array $build
+ *   Build array.
+ *
+ * @return mixed
+ *   Return build array.
+ */
+function _add_js_classes_to_facets_block(array $build) {
+  $build['#attributes']['class'][] = 'block-facets-ajax';
+  if (empty($build['#id'])) {
+    $build['#id'] = Html::getUniqueId($build['#plugin_id']);
+  }
+  $build['#attributes']['class'][] = "js-facet-block-id-{$build['#id']}";
+
+  return $build;
 }
