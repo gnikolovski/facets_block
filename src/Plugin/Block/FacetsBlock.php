@@ -240,11 +240,15 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
   public function build() {
     $show_title = !isset($this->configuration['show_title']) ? TRUE : $this->configuration['show_title'];
     $facets_to_include = !isset($this->configuration['facets_to_include']) ? [] : $this->configuration['facets_to_include'];
+    $facets = $this->buildFacets($facets_to_include);
+
+    // Allow other modules to alter the facets array.
+    $this->moduleHandler->alter('facets_block_facets', $facets);
 
     return [
       '#theme' => 'facets_block',
       '#show_title' => $show_title,
-      '#facets' => $this->buildFacets($facets_to_include),
+      '#facets' => $facets,
     ];
   }
 
