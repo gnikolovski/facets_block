@@ -9,6 +9,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\Template\Attribute;
 use Drupal\facets\FacetInterface;
 use Drupal\facets\FacetManager\DefaultFacetManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -223,9 +224,14 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
             continue;
           }
 
+          if (empty($build['#attributes'])) {
+            $build['#attributes'] = [];
+          }
+
           $facets[] = [
             'title' => $facet_title,
             'content' => $build,
+            'attributes' => new Attribute($build['#attributes']),
           ];
         }
       }
