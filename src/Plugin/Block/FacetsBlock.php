@@ -183,10 +183,22 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
-    $this->configuration['show_title'] = $form_state->getValue(['block_settings', 'show_title']);
-    $this->configuration['exclude_empty_facets'] = $form_state->getValue(['block_settings', 'exclude_empty_facets']);
-    $this->configuration['hide_empty_block'] = $form_state->getValue(['block_settings', 'hide_empty_block']);
-    $this->configuration['facets_to_include'] = $form_state->getValue(['block_settings', 'facets_to_include']);
+    $this->configuration['show_title'] = $form_state->getValue([
+      'block_settings',
+      'show_title',
+    ]);
+    $this->configuration['exclude_empty_facets'] = $form_state->getValue([
+      'block_settings',
+      'exclude_empty_facets',
+    ]);
+    $this->configuration['hide_empty_block'] = $form_state->getValue([
+      'block_settings',
+      'hide_empty_block',
+    ]);
+    $this->configuration['facets_to_include'] = $form_state->getValue([
+      'block_settings',
+      'facets_to_include',
+    ]);
   }
 
   /**
