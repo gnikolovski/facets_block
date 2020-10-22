@@ -116,6 +116,13 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
       '#default_value' => isset($this->configuration['exclude_empty_facets']) ? $this->configuration['exclude_empty_facets'] : TRUE,
     ];
 
+    $form['block_settings']['hide_empty_block'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Hide empty block'),
+      '#description' => $this->t("Don't render the Facets Block if no facets are available (for instance when no search results are found)."),
+      '#default_value' => isset($this->configuration['hide_empty_block']) ? $this->configuration['hide_empty_block'] : FALSE,
+    ];
+
     $form['block_settings']['facets_to_include'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Facets to include'),
@@ -178,6 +185,7 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
   public function blockSubmit($form, FormStateInterface $form_state) {
     $this->configuration['show_title'] = $form_state->getValue(['block_settings', 'show_title']);
     $this->configuration['exclude_empty_facets'] = $form_state->getValue(['block_settings', 'exclude_empty_facets']);
+    $this->configuration['hide_empty_block'] = $form_state->getValue(['block_settings', 'hide_empty_block']);
     $this->configuration['facets_to_include'] = $form_state->getValue(['block_settings', 'facets_to_include']);
   }
 

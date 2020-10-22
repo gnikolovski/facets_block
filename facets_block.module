@@ -40,4 +40,8 @@ function facets_block_theme($existing, $type, $theme, $path) {
  */
 function facets_block_block_view_facets_block_alter(array &$build, BlockPluginInterface $block) {
   $build['#pre_render'][] = '\Drupal\facets_block\AddJsClasses::preRender';
+
+  if (!empty($build['#configuration']['hide_empty_block'])) {
+    $build['#pre_render'][] = '\Drupal\facets_block\AddCssClasses::preRender';
+  }
 }
