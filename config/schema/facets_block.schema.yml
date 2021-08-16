@@ -16,3 +16,6 @@ block.settings.facets_block:
       label: 'Facets to include'
       sequence:
         type: string
+    add_js_classes:
+      type: boolean
+      label: 'Add JS classes for Facets block'

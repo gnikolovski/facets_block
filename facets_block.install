@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Install and update hooks.
+ */
+
+/**
+ * Implements hook_update_N().
+ */
+function facets_block_update_8001(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+
+  foreach ($config_factory->listAll('block.block.facetsblock') as $block_config_name) {
+    $block = $config_factory->getEditable($block_config_name);
+    $settings = $block->get('settings');
+    $settings['add_js_classes'] = TRUE;
+    $block->set('settings', $settings);
+    $block->save();
+  }
+
+}

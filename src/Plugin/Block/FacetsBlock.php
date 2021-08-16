@@ -123,6 +123,12 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
       '#default_value' => isset($this->configuration['hide_empty_block']) ? $this->configuration['hide_empty_block'] : FALSE,
     ];
 
+    $form['block_settings']['add_js_classes'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Add JS classes for Facets block'),
+      '#default_value' => $this->configuration['add_js_classes'] ?? FALSE,
+    ];
+
     $form['block_settings']['facets_to_include'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Facets to include'),
@@ -198,6 +204,10 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $this->configuration['facets_to_include'] = $form_state->getValue([
       'block_settings',
       'facets_to_include',
+    ]);
+    $this->configuration['add_js_classes'] = $form_state->getValue([
+      'block_settings',
+      'add_js_classes',
     ]);
   }
 
