@@ -201,10 +201,10 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
       'block_settings',
       'hide_empty_block',
     ]);
-    $this->configuration['facets_to_include'] = $form_state->getValue([
+    $this->configuration['facets_to_include'] = array_values(array_filter($form_state->getValue([
       'block_settings',
       'facets_to_include',
-    ]);
+    ])));
     $this->configuration['add_js_classes'] = $form_state->getValue([
       'block_settings',
       'add_js_classes',
@@ -227,43 +227,41 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
     $available_facets = $this->getAvailableFacets();
 
-    foreach ($available_facets as $plugin_id => $facet_title) {
-      if (isset($facets_to_include[$plugin_id]) && $facets_to_include[$plugin_id] === $plugin_id) {
-        $block_plugin = $this->pluginManagerBlock->createInstance($plugin_id, []);
+    foreach (array_intersect_key($available_facets, array_combine($facets_to_include, $facets_to_include)) as $plugin_id => $facet_title) {
+      $block_plugin = $this->pluginManagerBlock->createInstance($plugin_id, []);
 
-        if ($block_plugin && $block_plugin->access($this->currentUser)) {
-          $build = $block_plugin->build();
+      if ($block_plugin && $block_plugin->access($this->currentUser)) {
+        $build = $block_plugin->build();
 
-          $exclude_empty_facets = !isset($this->configuration['exclude_empty_facets']) ? TRUE : $this->configuration['exclude_empty_facets'];
+        $exclude_empty_facets = !isset($this->configuration['exclude_empty_facets']) ? TRUE : $this->configuration['exclude_empty_facets'];
 
-          // Skip empty facets.
-          $is_empty = FALSE;
+        // Skip empty facets.
+        $is_empty = FALSE;
 
-          if (!$build) {
-            $is_empty = TRUE;
-          }
-          elseif (isset($build[0]['#attributes']['class']) && in_array('facet-empty', $build[0]['#attributes']['class'])) {
-            $is_empty = TRUE;
-          }
-          // Check if Summary Facet is empty.
-          elseif (isset($build['#items']) && count($build['#items']) == 0) {
-            $is_empty = TRUE;
-          }
-
-          if ($exclude_empty_facets && $is_empty) {
-            continue;
-          }
-
-          if (empty($build['#attributes'])) {
-            $build['#attributes'] = [];
-          }
-
-          $facets[] = [
-            'title' => $facet_title,
-            'content' => $build,
-            'attributes' => new Attribute($build['#attributes']),
-          ];
+        if (!$build) {
+          $is_empty = TRUE;
         }
+        elseif (isset($build[0]['#attributes']['class']) && in_array('facet-empty', $build[0]['#attributes']['class'])) {
+          $is_empty = TRUE;
+        }
+        // Check if Summary Facet is empty.
+        elseif (isset($build['#items']) && count($build['#items']) == 0) {
+          $is_empty = TRUE;
+        }
+
+        if ($exclude_empty_facets && $is_empty) {
+          continue;
+        }
+
+        if (empty($build['#attributes'])) {
+          $build['#attributes'] = [];
+        }
+
+        $facets[] = [
+          'title' => $facet_title,
+          'content' => $build,
+          'attributes' => new Attribute($build['#attributes']),
+        ];
       }
     }
 
