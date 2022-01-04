@@ -5,6 +5,7 @@ namespace Drupal\facets_block\Plugin\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Cache\UncacheableDependencyTrait;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -12,6 +13,7 @@ use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\facets\FacetInterface;
 use Drupal\facets\FacetManager\DefaultFacetManager;
+use Drupal\facets_summary\FacetsSummaryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -55,6 +57,13 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
   protected $currentUser;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * FacetsBlock constructor.
    *
    * @param array $configuration
@@ -71,13 +80,16 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
    *   The Plugin manager block.
    * @param \Drupal\Core\Session\AccountProxyInterface $current_user
    *   Current user.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, DefaultFacetManager $facets_manager, ModuleHandlerInterface $module_handler, BlockManagerInterface $plugin_manager_block, AccountProxyInterface $current_user) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, DefaultFacetManager $facets_manager, ModuleHandlerInterface $module_handler, BlockManagerInterface $plugin_manager_block, AccountProxyInterface $current_user, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->facetsManager = $facets_manager;
     $this->moduleHandler = $module_handler;
     $this->pluginManagerBlock = $plugin_manager_block;
     $this->currentUser = $current_user;
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -91,7 +103,8 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
       $container->get('facets.manager'),
       $container->get('module_handler'),
       $container->get('plugin.manager.block'),
-      $container->get('current_user')
+      $container->get('current_user'),
+      $container->get('entity_type.manager')
     );
   }
 
@@ -146,43 +159,29 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
    *   An array of enabled facets.
    */
   protected function getAvailableFacets() {
-    $enabled_facets = $this->facetsManager->getEnabledFacets();
-    uasort($enabled_facets, [$this, 'sortFacetsByWeight']);
-
     $available_facets = [];
 
-    if ($this->moduleHandler->moduleExists('facets_summary')) {
-      $available_facets['facets_summary_block:summary'] = $this->t('Summary');
-    }
-
-    foreach ($enabled_facets as $facet) {
-      /** @var \Drupal\facets\Entity\Facet $facet */
-      $available_facets['facet_block:' . $facet->id()] = $facet->getName();
+    /** @var \Drupal\facets\FacetListBuilder $list_builder */
+    $list_builder = $this->entityTypeManager->getHandler('facets_facet', 'list_builder');
+    $facet_groups = $list_builder->loadGroups();
+    foreach ($facet_groups['facet_source_groups'] as $facet_data) {
+      foreach ($facet_data['facets'] as $facet) {
+        if ($facet instanceof FacetInterface) {
+          $available_facets['facet_block:' . $facet->id()] = $this->t('@facet_source: @facet_name', [
+            '@facet_source' => $facet_data['facet_source']['label'],
+            '@facet_name' => $facet->getName(),
+          ]);
+        }
+        if ($facet instanceof FacetsSummaryInterface) {
+          $available_facets['facets_summary_block:' . $facet->id()] = $this->t('@facet_source: @facet_name', [
+            '@facet_source' => $facet_data['facet_source']['label'],
+            '@facet_name' => $facet->getName(),
+          ]);
+        }
+      }
     }
 
     return $available_facets;
-  }
-
-  /**
-   * Sorts array of objects by object weight property.
-   *
-   * @param \Drupal\facets\FacetInterface $a
-   *   A facet.
-   * @param \Drupal\facets\FacetInterface $b
-   *   A facet.
-   *
-   * @return int
-   *   Sort value.
-   */
-  protected function sortFacetsByWeight(FacetInterface $a, FacetInterface $b) {
-    $a_weight = $a->getWeight();
-    $b_weight = $b->getWeight();
-
-    if ($a_weight == $b_weight) {
-      return 0;
-    }
-
-    return ($a_weight < $b_weight) ? -1 : 1;
   }
 
   /**
