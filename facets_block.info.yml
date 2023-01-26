@@ -3,6 +3,6 @@ description: 'Render Facets in a single block.'
 package: 'Other'
 type: module
 core: 8.x
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^9 || ^10
 dependencies:
   - facets:facets
