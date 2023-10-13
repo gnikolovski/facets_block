@@ -258,7 +258,7 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
         $facets[] = [
           '#block_plugin' => $block_plugin,
-          'title' => $facet_title,
+          'title' => $build['0']['#facet']->getName(),
           'content' => $build,
           'attributes' => new Attribute($build['#attributes']),
         ];
