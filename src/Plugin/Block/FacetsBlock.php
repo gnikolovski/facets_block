@@ -256,9 +256,19 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
           $build['#attributes'] = [];
         }
 
+        if (
+          isset($build['0']['#facet']) &&
+          $build['0']['#facet'] instanceof FacetInterface
+        ) {
+          $title = $build['0']['#facet']->getName();
+        }
+        else {
+          $title = $block_plugin->label();
+        }
+
         $facets[] = [
           '#block_plugin' => $block_plugin,
-          'title' => $build['0']['#facet']->getName(),
+          'title' => $title,
           'content' => $build,
           'attributes' => new Attribute($build['#attributes']),
         ];
