@@ -19,7 +19,7 @@ class FacetsBlockTest extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'block',
     'facets_block',
   ];
