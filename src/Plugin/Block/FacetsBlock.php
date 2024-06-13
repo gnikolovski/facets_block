@@ -266,6 +266,9 @@ class FacetsBlock extends BlockBase implements ContainerFactoryPluginInterface {
           $title = $block_plugin->label();
         }
 
+        // Inject unique class per facet.
+        $build['#attributes']['class'][] = strtr($plugin_id, '_:', '--');
+
         $facets[] = [
           '#block_plugin' => $block_plugin,
           'title' => $title,
