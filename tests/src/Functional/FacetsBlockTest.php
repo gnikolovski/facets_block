@@ -2,8 +2,8 @@
 
 namespace Drupal\Tests\facets_block\Functional;
 
-use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\block\Traits\BlockCreationTrait;
 
 /**
  * Tests the Facets Block.

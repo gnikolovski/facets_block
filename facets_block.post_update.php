@@ -5,8 +5,8 @@
  * Post update functions for Facets block.
  */
 
-use Drupal\block\BlockInterface;
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\block\BlockInterface;
 
 /**
  * Simplify facets_to_include list.
