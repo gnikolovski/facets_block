@@ -56,11 +56,33 @@ include:
 # variables:
 #   SKIP_ESLINT: '1'
 variables:
-  _PHPUNIT_CONCURRENT: '1'
-  OPT_IN_TEST_PREVIOUS_MINOR: '1'
-  OPT_IN_TEST_NEXT_MINOR: '1'
-  OPT_IN_TEST_NEXT_MAJOR: '1'
-  OPT_IN_TEST_MAX_PHP: '1'
+  _PHPUNIT_CONCURRENT:
+    value: '1'
+    description: '(Experimental) Run the phpunit job leveraging concurrency. This will use the Drupal core `run-tests.sh` script currently used in DrupalCI for both core and contrib.'
+
+  OPT_IN_TEST_CURRENT:
+    value: '1'
+    description: 'Set to 0 to opt out testing against the current Drupal core version.'
+
+  OPT_IN_TEST_PREVIOUS_MINOR:
+    value: '1'
+    description: 'Set to 0 to opt out testing against the previous minor Drupal core version.'
+
+  OPT_IN_TEST_NEXT_MINOR:
+    value: '1'
+    description: 'Set to 0 to opt out testing against the next minor Drupal core version.'
+
+  OPT_IN_TEST_PREVIOUS_MAJOR:
+    value: '1'
+    description: 'Set to 0 to opt out testing against the previous major Drupal core version.'
+
+  OPT_IN_TEST_NEXT_MAJOR:
+    value: '1'
+    description: 'Set to 0 to opt out testing against the next major Drupal core version.'
+
+  OPT_IN_TEST_MAX_PHP:
+    value: '1'
+    description: 'Set to 0 to opt out testing against the maximum/latest supported version of PHP for the current stable version of Drupal.'
 
 ###################################################################################
 #
